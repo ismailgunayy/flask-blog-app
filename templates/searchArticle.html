@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+    <h3>Search Results</h3>
+
+
+    <ul class='list-group'>
+            {% for article in articles %}
+                <li class='list-group-item d-flex justify-content-between align-items-center'>
+                    <div class='mr-auto'>
+                        <a href="/article/{{article.id}}">{{article.title}}</a>
+                    </div>
+                    <div class='ml-auto'>
+                        <span class='badge-pill'><a href="/userArticles/{{article.author}}">{{article.author}}</a></span>
+                        |
+                        <span class='badge-pill'>{{article.created_date}}</span>
+                    </div>
+                </li>
+            {% endfor %}
+            {% for article in articles2 %}
+                <li class='list-group-item d-flex justify-content-between align-items-center'>
+                    <div class='mr-auto'>
+                        <a href="/article/{{article.id}}">{{article.title}}</a>
+                    </div>
+                    <div class='ml-auto'>
+                        <span class='badge-pill'><a href="/userArticles/{{article.author}}">{{article.author}}</a></span>
+                        |
+                        <span class='badge-pill'>{{article.created_date}}</span>
+                    </div>
+                </li>
+            {% endfor %}
+
+        </ul>
+
+{% endblock body %}

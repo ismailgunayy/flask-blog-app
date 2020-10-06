@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+    {% from "includes/_formhelpers.html" import render_field %}
+    <h3>Login</h3>
+    <hr>
+
+    <form method='post'>
+        {{ render_field(form.username, class='form-control') }}
+        {{ render_field(form.password, class='form-control') }}
+        <button type='submit' class='btn btn-primary'>Login</button>
+    </form>
+    <br>
+    <p>If you don't have an account yet, <a href="/register">register</a> now</p>
+
+{% endblock body %}

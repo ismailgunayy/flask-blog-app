@@ -1,33 +1,35 @@
-{% extends 'layout.html' %}
+{% extends 'layout.html' %} {% block body %} {% if article %} {% if
+session['username'] == article.author or session['username'] == 'admin' %}
+<div class="jumbotron">
+  <h1 class="display-3">
+    {{article.title}}
+    <a href="/editArticle/{{article.id}}" class="btn btn-secondary"
+      ><i class="far fa-edit"></i
+    ></a>
+    <a
+      href="/deleteArticle/{{article.id}}"
+      class="btn btn-danger"
+      onclick="return confirm('Are you sure you want to delete this article?');"
+      ><i class="fas fa-trash"></i
+    ></a>
+  </h1>
+  <hr class="my-2" />
+  <br />
+  {{article.content|safe}}
+</div>
+{% else %}
+<div class="jumbotron">
+  <h1 class="display-3">{{article.title}}</h1>
+  <div class="row">
+    <p class="lead col-4"><b>Author:</b> {{article.author}}</p>
+    <p class="lead col-4"><b>Date:</b> {{article.created_date}}</p>
+  </div>
+  <hr class="my-2" />
+  <br />
+  {{article.content|safe}}
+</div>
+{% endif %} {% else %}
 
-{% block body %}
+<div class="alert alert-warning">There is no such article.</div>
 
-    {% if article %}
-        {% if session['username'] == article.author or session['username'] == 'admin' %}
-            <div class="jumbotron">
-                <h1 class="display-3">{{article.title}}
-                    <a href="/editArticle/{{article.id}}" class='btn btn-secondary'><i class="far fa-edit"></i></a>
-                    <a href="/deleteArticle/{{article.id}}" class='btn btn-danger' onclick="return confirm('Are you sure you want to delete this article?');"><i class="fas fa-trash"></i></a>
-                </h1>
-                <hr class="my-2">
-                <br>
-                {{article.content|safe}}
-            </div>
-        {% else %}
-            <div class="jumbotron">
-            <h1 class="display-3">{{article.title}}</h1>
-            <div class='row'>
-                <p class="lead col-4"><b>Author:</b> {{article.author}}</p>
-                <p class="lead col-4"><b>Date:</b> {{article.created_date}}</p>
-            </div>
-            <hr class="my-2">
-            <br>
-            {{article.content|safe}}
-            </div>
-        {% endif %}
-    {% else %}
-
-        <div class='alert alert-warning'>There is no such article.</div>
-
-    {% endif %}
-{% endblock body %}
+{% endif %} {% endblock body %}

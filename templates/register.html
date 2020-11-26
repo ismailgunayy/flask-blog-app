@@ -1,21 +1,18 @@
-{% extends "layout.html" %}
+{% extends "layout.html" %} {% block body %} {% from
+"includes/_formhelpers.html" import render_field %}
+<h3>Register</h3>
+<hr />
 
-{% block body %}
+<form method="post">
+  {{render_field(form.name, class='form-control')}}
+  {{render_field(form.username, class='form-control')}}
+  {{render_field(form.email, class='form-control')}}
+  {{render_field(form.password, class='form-control')}}
+  {{render_field(form.confirm, class='form-control')}}
+  <button type="submit" class="btn btn-primary">Register</button>
+</form>
 
-    {% from "includes/_formhelpers.html" import render_field %}
-    <h3>Register</h3>
-    <hr>
-
-    <form method='post'>
-        {{ render_field(form.name, class='form-control') }}
-        {{ render_field(form.username, class='form-control') }}
-        {{ render_field(form.email, class='form-control') }}
-        {{ render_field(form.password, class='form-control') }}
-        {{ render_field(form.confirm, class='form-control') }}
-        <button type='submit' class='btn btn-primary'>Register</button>
-    </form>
-
-    <br>
-    <p>If you already have an account, <a href="/login">login</a> now</p>
+<br />
+<p>If you already have an account, <a href="/login">login</a> now</p>
 
 {% endblock body %}

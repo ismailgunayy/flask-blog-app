@@ -10,10 +10,12 @@ pip install passlib
 pip install wtforms
 ```
 
-### Run the server
+### Set the server
 
+In the directory of application
 ```
-python app.py
+set FLASK_APP=app.py
+flask run
 ```
 
 Go to localhost:5000/

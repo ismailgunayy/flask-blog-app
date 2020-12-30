@@ -1,4 +1,6 @@
-{% extends 'layout.html' %} {% block body %}
+{% extends 'layout.html' %}
+
+{% block body %}
 
 <h3>Search Results</h3>
 
@@ -10,8 +12,7 @@
     </div>
     <div class="ml-auto">
       <span class="badge-pill"
-        ><a href="/userArticles/{{article.author}}">{{article.author}}</a></span
-      >
+        ><a href="/userArticles/{{article.author}}">{{article.author}}</a></span>
       |
       <span class="badge-pill">{{article.created_date}}</span>
     </div>

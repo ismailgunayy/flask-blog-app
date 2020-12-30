@@ -1,4 +1,8 @@
-{% extends "layout.html" %} {% block body %}
+{% extends "layout.html" %}
+{% block title %}{{session['username']}}'s Dashboard
+{% endblock title %}
+
+{% block body %}
 
 <h3>{{session['username']}}'s Dashboard</h3>
 <hr />

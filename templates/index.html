@@ -1,4 +1,7 @@
-{% extends 'layout.html' %} {% block body %}
+{% extends 'layout.html' %}
+{% block title %}Blogg{% endblock title %}
+
+{% block body %}
 
 <div class="jumbotron text-center">
   <h1 class="display-3">İsmail Günay</h1>
@@ -7,14 +10,14 @@
   </p>
 
   {% if not session['loggedIn'] %}
-  <p class="lead">
-    <a class="btn btn-primary btn-lg" href="/register" role="button"
-      >Register</a
-    >
-  </p>
-  <p class="lead">
-    <a class="btn btn-secondary" href="/login" role="button">Login</a>
-  </p>
+    <p class="lead">
+      <a class="btn btn-primary btn-lg" href="/register" role="button"
+        >Register</a
+      >
+    </p>
+    <p class="lead">
+      <a class="btn btn-secondary" href="/login" role="button">Login</a>
+    </p>
   {% endif %}
 </div>
 

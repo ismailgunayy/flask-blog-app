@@ -17,4 +17,4 @@ set FLASK_APP=app.py
 flask run
 ```
 
-Go to localhost:5000/
+Go to `localhost:5000/`

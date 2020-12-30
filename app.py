@@ -30,7 +30,7 @@ dbCursor.execute(dbUsersQuery)
 dbConnection.commit()
 
 app = Flask(__name__)
-app.secret_key = 'flaskBlogApp'
+app.secret_key = 'flask-blog-app'
 app.config['SESSION_TYPE'] = 'filesystem'
 
 # app.config['MYSQL_HOST'] = 'localhost'

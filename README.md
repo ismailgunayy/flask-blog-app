@@ -4,7 +4,6 @@
 
 ```
 pip install Flask
-pip install Flask-MySQLdb
 pip install Flask-WTF
 pip install passlib
 pip install wtforms

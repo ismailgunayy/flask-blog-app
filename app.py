@@ -1,8 +1,44 @@
-from flask import Flask, render_template, flash, redirect, url_for, session, logging, request
+from functools import wraps
+import sqlite3
+from flask import Flask, render_template, flash, redirect, url_for, session, request
 from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
-from functools import wraps
+
+dbConnection = sqlite3.connect('blog.db', check_same_thread=False)
+dbConnection.row_factory = sqlite3.Row
+dbCursor = dbConnection.cursor()
+
+dbArticlesQuery = """CREATE TABLE IF NOT EXISTS articles(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT,
+                    author TEXT,
+                    content TEXT,
+                    created_date DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )"""
+
+dbUsersQuery = """CREATE TABLE IF NOT EXISTS users(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT,
+                    username TEXT,
+                    email TEXT,
+                    password TEXT
+                )"""
+
+dbCursor.execute(dbArticlesQuery)
+dbCursor.execute(dbUsersQuery)
+dbConnection.commit()
+
+app = Flask(__name__)
+app.secret_key = 'flaskBlogApp'
+app.config['SESSION_TYPE'] = 'filesystem'
+
+# app.config['MYSQL_HOST'] = 'localhost'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = ''
+# app.config['MYSQL_DB'] = 'ismailgunay'
+# app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+# mysql = MySQL(app)
 
 
 # LOGIN CHECK DECORATOR
@@ -11,9 +47,9 @@ def login_required(f):
     def decorated_function(*args, **kwargs):
         if 'loggedIn' in session:
             return f(*args, **kwargs)
-        else:
-            flash('You must log in to view this page', 'warning')
-            return redirect(url_for('login'))
+
+        flash('You must log in to view this page', 'warning')
+        return redirect(url_for('login'))
 
     return decorated_function
 
@@ -22,8 +58,7 @@ def login_required(f):
 def adminCheck():
     if session['username'] == 'admin':
         return True
-    else:
-        return False
+    return False
 
 
 # REGISTER FORM CLASS
@@ -46,17 +81,6 @@ class LoginForm(Form):
     password = PasswordField('Password')
 
 
-app = Flask(__name__)
-app.secret_key = 'ismailgunay'
-
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = ''
-app.config['MYSQL_DB'] = 'ismailgunay'
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-mysql = MySQL(app)
-
-
 # INDEX
 @app.route('/')
 def index():
@@ -74,72 +98,69 @@ def about():
 @login_required
 def dashboard():
 
-    cursor = mysql.connection.cursor()
-
     if adminCheck():
         query = 'SELECT * FROM articles'
-        result = cursor.execute(query)
+        dbCursor.execute(query)
+        result = dbCursor.fetchall()
 
     else:
-        query = 'SELECT * FROM articles WHERE author = %s'
-        result = cursor.execute(query, (session['username'],))
+        query = 'SELECT * FROM articles WHERE author = ?'
+        dbCursor.execute(query, (session['username'],))
+        result = dbCursor.fetchall()
 
-    if result > 0:
-        articles = cursor.fetchall()
+    if len(result) > 0:
+        articles = result
         return render_template('dashboard.html', articles=articles)
 
-    else:
-        return render_template('dashboard.html')
+    return render_template('dashboard.html')
 
 
 # ARTICLES
 @app.route('/articles')
 def articles():
-    cursor = mysql.connection.cursor()
 
     query = 'SELECt * FROM articles'
 
-    result = cursor.execute(query)
+    dbCursor.execute(query)
+    result = dbCursor.fetchall()
 
-    if result > 0:
-        articles = cursor.fetchall()
+    if len(result) > 0:
+        articles = result
         return render_template('articles.html', articles=articles)
 
-    else:
-        return render_template('articles.html')
+    return render_template('articles.html')
 
 
 # USER ARTICLES
 @app.route('/userArticles/<string:author>')
 def userArticles(author):
-    cursor = mysql.connection.cursor()
 
-    query = 'SELECT * FROM articles WHERE author = %s'
+    query = 'SELECT * FROM articles WHERE author = ?'
 
-    result = cursor.execute(query, (author,))
+    dbCursor.execute(query, (author,))
+    result = dbCursor.fetchall()
 
-    if result > 0:
-        articles = cursor.fetchall()
+    if len(result) > 0:
+        articles = result
         return render_template('userArticles.html', articles=articles, author=author)
 
-    else:
-        return render_template('userArticles.html')
+    return render_template('userArticles.html')
 
 
 # ARTICLE
 @app.route('/article/<string:id>')
 def detail(id):
-    cursor = mysql.connection.cursor()
 
-    query = 'SELECT * FROM articles WHERE id = %s'
+    query = 'SELECT * FROM articles WHERE id = ?'
 
-    result = cursor.execute(query, (id,))
+    dbCursor.execute(query, (id,))
+    result = dbCursor.fetchall()
 
-    if result > 0:
-        article = cursor.fetchone()
+    if len(result) > 0:
+        article = result[0]
         return render_template('article.html', article=article)
-    else:
-        return render_template('article.html')
+
+    return render_template('article.html')
 
 
 # ADD ARTICLE
@@ -154,20 +175,17 @@ def addArticle():
         title = form.title.data
         content = form.content.data
 
-        cursor = mysql.connection.cursor()
+        query = 'INSERT INTO articles(title, author, content) VALUES(?, ?, ?)'
 
-        query = 'INSERT INTO articles(title, author, content) VALUES(%s, %s, %s)'
-
-        cursor.execute(query, (title, session['username'], content))
-        mysql.connection.commit()
-        cursor.close()
+        dbCursor.execute(query, (title, session['username'], content))
+        dbConnection.commit()
 
         flash('Article has been added successfully', 'success')
 
         return redirect(url_for('dashboard'))
 
-    else:
-        return render_template('addArticle.html', form=form)
+
+    return render_template('addArticle.html', form=form)
 
 
 # EDIT ARTICLE
@@ -176,28 +194,29 @@ def addArticle():
 def editArticle(id):
 
     if request.method == 'GET':
-        cursor = mysql.connection.cursor()
 
         if adminCheck():
-            query = 'SELECT * FROM articles WHERE id = %s'
-            result = cursor.execute(query, (id,))
+            query = 'SELECT * FROM articles WHERE id = ?'
+            dbCursor.execute(query, (id,))
+            result = dbCursor.fetchall()
 
         else:
-            query = 'SELECT * FROM articles WHERE id = %s and author = %s'
-            result = cursor.execute(query, (id, session['username']))
+            query = 'SELECT * FROM articles WHERE id = ? and author = ?'
+            dbCursor.execute(query, (id, session['username']))
+            result = dbCursor.fetchall()
 
-        if result > 0:
-            article = cursor.fetchone()
+        if len(result) > 0:
+            article = result[0]
             form = ArticleForm()
 
             form.title.data = article['title']
             form.content.data = article['content']
             return render_template('editArticle.html', form=form)
 
-        else:
-            flash(
-                'There is no such article or you may have not the permission to edit', 'warning')
-            return redirect(url_for('dashboard'))
+
+        flash(
+            'There is no such article or you may have not the permission to edit', 'warning')
+        return redirect(url_for('dashboard'))
 
     else:
 
@@ -206,12 +225,10 @@ def editArticle(id):
         titleUpdated = form.title.data
         contentUpdated = form.content.data
 
-        query = 'UPDATE articles SET title = %s, content = %s where id = %s'
+        query = 'UPDATE articles SET title = ?, content = ? where id = ?'
 
-        cursor = mysql.connection.cursor()
-
-        cursor.execute(query, (titleUpdated, contentUpdated, id))
-        mysql.connection.commit()
+        dbCursor.execute(query, (titleUpdated, contentUpdated, id))
+        dbConnection.commit()
 
         flash('Article has been updated successfully', 'success')
         return redirect(url_for('dashboard'))
@@ -221,26 +238,27 @@ def editArticle(id):
 @app.route('/deleteArticle/<string:id>')
 @login_required
 def deleteArticle(id):
-    cursor = mysql.connection.cursor()
 
     if adminCheck():
-        query = 'SELECT * FROM articles WHERE id = %s'
-        result = cursor.execute(query, (id,))
+        query = 'SELECT * FROM articles WHERE id = ?'
+        dbCursor.execute(query, (id,))
+        result = dbCursor.fetchall()
 
     else:
-        query = 'SELECT * FROM articles WHERE author = %s and id = %s'
-        result = cursor.execute(query, (session['username'], id))
+        query = 'SELECT * FROM articles WHERE author = ? and id = ?'
+        dbCursor.execute(query, (session['username'], id))
+        result = dbCursor.fetchall()
 
-    if result > 0:
-        query = 'DELETE FROM articles WHERE id = %s'
-        cursor.execute(query, (id,))
-        mysql.connection.commit()
+    if len(result) > 0:
+        query = 'DELETE FROM articles WHERE id = ?'
+        dbCursor.execute(query, (id,))
+        dbConnection.commit()
 
         flash('Article has been deleted successfully', 'success')
         return redirect(url_for('dashboard'))
-    else:
-        flash('There is no such article or you may have not the permission to delete', 'warning')
-        return redirect(url_for('dashboard'))
+
+    flash('There is no such article or you may have not the permission to delete', 'warning')
+    return redirect(url_for('dashboard'))
 
 
 # SEARCH ARTICLE
@@ -253,18 +271,17 @@ def searchArticle():
     else:
         keyword = request.form.get('keyword')
 
-        cursor = mysql.connection.cursor()
         query = 'SELECT * FROM articles WHERE title LIKE "%' + keyword + '%" '
 
-        result = cursor.execute(query)
+        dbCursor.execute(query)
+        result = dbCursor.fetchall()
 
-        if result > 0:
-            articles = cursor.fetchall()
+        if len(result) > 0:
+            articles = dbCursor.fetchall()
             return render_template('searchArticle.html', articles=articles)
 
-        else:
-            flash('There is no article includes {}'.format(keyword), 'warning')
-            return redirect(url_for('articles'))
+        flash('There is no article includes {}'.format(keyword), 'warning')
+        return redirect(url_for('articles'))
 
 
 # ARTICLE FORM
@@ -287,19 +304,16 @@ def register():
         email = form.email.data
         password = sha256_crypt.encrypt(form.password.data)
 
-        cursor = mysql.connection.cursor()
+        query = 'INSERT INTO users(name, username, email, password) VALUES(?, ?, ?, ?)'
 
-        query = 'INSERT INTO users(name, username, email, password) VALUES(%s, %s, %s, %s)'
-
-        cursor.execute(query, (name, username, email, password))
-        mysql.connection.commit()
-        cursor.close()
+        dbCursor.execute(query, (name, username, email, password))
+        dbConnection.commit()
 
         flash('Successfully registered', 'success')
 
         return redirect(url_for('login'))
-    else:
-        return render_template('register.html', form=form)
+
+    return render_template('register.html', form=form)
 
 
 # LOGIN
@@ -312,13 +326,15 @@ def login():
         username = form.username.data
         passwordEntered = form.password.data
 
-        cursor = mysql.connection.cursor()
+        query = 'SELECT * FROM users WHERE username = ?'
+        dbCursor.execute(query, (username,))
+        result = dbCursor.fetchall()
 
-        query = 'SELECT * FROM users WHERE username = %s'
-        result = cursor.execute(query, (username,))
-
-        if result > 0:
-            data = cursor.fetchone()
+        if len(result) > 0:
+            data = result[0]
+            print(result)
+            print(data)
+            print(type(data))
             realPassword = data['password']
 
             if sha256_crypt.verify(passwordEntered, realPassword):
@@ -328,14 +344,13 @@ def login():
                 session['username'] = username
 
                 return redirect(url_for('index'))
-            else:
-                flash('Wrong password!', 'danger')
-                return redirect(url_for('login'))
 
-        else:
-            flash('There is no user named {}'.format(
-                username), 'danger')
+            flash('Wrong password!', 'danger')
             return redirect(url_for('login'))
+
+        flash('There is no user named {}'.format(
+            username), 'danger')
+        return redirect(url_for('login'))
 
     else:
         return render_template('login.html', form=form)
@@ -352,3 +367,6 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+

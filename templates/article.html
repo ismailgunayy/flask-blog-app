@@ -1,5 +1,5 @@
-{% extends 'layout.html' %} {% block body %} {% if article %} {% if
-session['username'] == article.author or session['username'] == 'admin' %}
+{% extends 'layout.html' %} {% block body %} {% if article %}
+{% if session['username'] == article.author or session['username'] == 'admin' %}
 <div class="jumbotron">
   <h1 class="display-3">
     {{article.title}}

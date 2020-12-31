@@ -32,6 +32,7 @@ dbConnection.commit()
 app = Flask(__name__)
 app.secret_key = 'flask-blog-app'
 app.config['SESSION_TYPE'] = 'filesystem'
+app.static_folder = 'static'
 
 # app.config['MYSQL_HOST'] = 'localhost'
 # app.config['MYSQL_USER'] = 'root'

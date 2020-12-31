@@ -1,0 +1,44 @@
+img {
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #343a40;
+  color: white;
+}
+
+.footer-icon {
+  color: grey;
+  text-decoration: none;
+}
+
+.fa-github:hover {
+  color: white;
+}
+
+.fa-linkedin-in:hover {
+  color: #0A66C2;
+}
+
+.fa-twitter:hover {
+  color: #2b8bf2;
+}
+
+.fa-instagram:hover {
+  color: #AA39A3;
+}
+
+.fa-facebook-f:hover {
+  color: #1196F5;
+}
+
+.fa-youtube:hover {
+  color: #FF0000;
+}

@@ -9,36 +9,8 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
-
-    <style>
-      img {
-        object-fit: contain;
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-      }
-
-      footer {
-        position: fixed;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        background-color: #343a40;
-        color: white;
-        text-align: center;
-      }
-
-      .footer-icon {
-        color: white;
-        text-decoration: none;
-      }
-
-      .footer-icon:hover {
-        color: #2b8bf2;
-      }
-    </style>
-
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css') }}" />
+    <link rel="shortcut icon" href="{{url_for('static', filename='favicon.ico')}}">
     <title>{% block title %} İsmail's Blog {% endblock title %}</title>
   </head>
   <body>

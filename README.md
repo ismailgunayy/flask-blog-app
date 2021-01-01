@@ -8,10 +8,7 @@ pip install Flask-WTF
 pip install passlib
 pip install wtforms
 ```
-
-### Set the server
-
-In the directory of application
+In the directory of application,
 ```
 set FLASK_APP=app.py
 flask run

@@ -7,7 +7,7 @@ img {
 }
 
 footer {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   width: 100%;
   background-color: #343a40;
@@ -15,8 +15,13 @@ footer {
 }
 
 .footer-icon {
-  color: grey;
+  color: #a3a3a3;
   text-decoration: none;
+  transition: all .15s ease-in-out;
+}
+
+.footer-icon:hover {
+  transform: scale(1.6);
 }
 
 .fa-github:hover {

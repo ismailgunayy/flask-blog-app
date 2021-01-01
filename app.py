@@ -273,12 +273,15 @@ def searchArticle():
         keyword = request.form.get('keyword')
 
         query = 'SELECT * FROM articles WHERE title LIKE "%' + keyword + '%" '
+        query2 = 'SELECT * FROM articles WHERE content LIKE "%' + keyword + '%"'
 
         dbCursor.execute(query)
         result = dbCursor.fetchall()
+        dbCursor.execute(query2)
+        result = list(set(result + dbCursor.fetchall()))
 
         if len(result) > 0:
-            articles = dbCursor.fetchall()
+            articles = result
             return render_template('searchArticle.html', articles=articles)
 
         flash('There is no article includes {}'.format(keyword), 'warning')

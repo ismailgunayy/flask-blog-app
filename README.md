@@ -18,3 +18,6 @@ flask run
 ```
 
 Go to `localhost:5000/`
+
+Create an account and write some articles to see how the system works
+Please inform me if you see something wrong

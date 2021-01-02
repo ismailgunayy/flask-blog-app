@@ -89,6 +89,12 @@ def index():
     return render_template('index.html')
 
 
+# INDEX 2
+@app.route('/index')
+def index2():
+    return redirect(url_for('index'))
+
+
 # ABOUT
 @app.route('/about')
 def about():

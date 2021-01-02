@@ -4,12 +4,12 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
-dbConnection = sqlite3.connect('blog.db', check_same_thread=False)
+dbConnection = sqlite3.connect('app/blog.db', check_same_thread=False)
 dbConnection.row_factory = sqlite3.Row
 dbCursor = dbConnection.cursor()
 
 dbArticlesQuery = """CREATE TABLE IF NOT EXISTS articles(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    articleID INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT,
                     author TEXT,
                     content TEXT,
@@ -17,7 +17,7 @@ dbArticlesQuery = """CREATE TABLE IF NOT EXISTS articles(
                     )"""
 
 dbUsersQuery = """CREATE TABLE IF NOT EXISTS users(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    userID INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT,
                     username TEXT,
                     email TEXT,
@@ -156,12 +156,12 @@ def userArticles(author):
 
 
 # ARTICLE
-@app.route('/article/<string:id>')
-def detail(id):
+@app.route('/article/<string:articleID>')
+def detail(articleID):
 
-    query = 'SELECT * FROM articles WHERE id = ?'
+    query = 'SELECT * FROM articles WHERE articleID = ?'
 
-    dbCursor.execute(query, (id,))
+    dbCursor.execute(query, (articleID,))
     result = dbCursor.fetchall()
 
     if len(result) > 0:
@@ -196,20 +196,20 @@ def addArticle():
 
 
 # EDIT ARTICLE
-@app.route('/editArticle/<string:id>', methods=['GET', 'POST'])
+@app.route('/editArticle/<string:articleID>', methods=['GET', 'POST'])
 @login_required
-def editArticle(id):
+def editArticle(articleID):
 
     if request.method == 'GET':
 
         if adminCheck():
-            query = 'SELECT * FROM articles WHERE id = ?'
-            dbCursor.execute(query, (id,))
+            query = 'SELECT * FROM articles WHERE articleID = ?'
+            dbCursor.execute(query, (articleID,))
             result = dbCursor.fetchall()
 
         else:
-            query = 'SELECT * FROM articles WHERE id = ? and author = ?'
-            dbCursor.execute(query, (id, session['username']))
+            query = 'SELECT * FROM articles WHERE articleID = ? and author = ?'
+            dbCursor.execute(query, (articleID, session['username']))
             result = dbCursor.fetchall()
 
         if len(result) > 0:
@@ -231,9 +231,9 @@ def editArticle(id):
         titleUpdated = form.title.data
         contentUpdated = form.content.data
 
-        query = 'UPDATE articles SET title = ?, content = ? where id = ?'
+        query = 'UPDATE articles SET title = ?, content = ? where articleID = ?'
 
-        dbCursor.execute(query, (titleUpdated, contentUpdated, id))
+        dbCursor.execute(query, (titleUpdated, contentUpdated, articleID))
         dbConnection.commit()
 
         flash('Article has been updated successfully', 'success')
@@ -241,23 +241,23 @@ def editArticle(id):
 
 
 # DELETE ARTICLE
-@app.route('/deleteArticle/<string:id>')
+@app.route('/deleteArticle/<string:articleID>')
 @login_required
-def deleteArticle(id):
+def deleteArticle(articleID):
 
     if adminCheck():
-        query = 'SELECT * FROM articles WHERE id = ?'
-        dbCursor.execute(query, (id,))
+        query = 'SELECT * FROM articles WHERE articleID = ?'
+        dbCursor.execute(query, (articleID,))
         result = dbCursor.fetchall()
 
     else:
-        query = 'SELECT * FROM articles WHERE author = ? and id = ?'
-        dbCursor.execute(query, (session['username'], id))
+        query = 'SELECT * FROM articles WHERE author = ? and articleID = ?'
+        dbCursor.execute(query, (session['username'], articleID))
         result = dbCursor.fetchall()
 
     if len(result) > 0:
-        query = 'DELETE FROM articles WHERE id = ?'
-        dbCursor.execute(query, (id,))
+        query = 'DELETE FROM articles WHERE articleID = ?'
+        dbCursor.execute(query, (articleID,))
         dbConnection.commit()
 
         flash('Article has been deleted successfully', 'success')
@@ -305,6 +305,20 @@ def register():
         username = form.username.data
         email = form.email.data
         password = sha256_crypt.encrypt(form.password.data)
+
+        checkQuery = 'SELECT * FROM users WHERE username = ? or email = ?'
+
+        dbCursor.execute(checkQuery, (username, email))
+        result = list(set(dbCursor.fetchall()))
+
+        for article in tuple(result):
+            if article[2] == 'username':
+                flash('There is already a user who use this username', 'warning')
+                return redirect(url_for('register'))
+
+            elif article[3] == email:
+                flash('There is already a user who use this email', 'warning')
+                return redirect(url_for('register'))
 
         query = 'INSERT INTO users(name, username, email, password) VALUES(?, ?, ?, ?)'
 
@@ -375,4 +389,4 @@ def errorHandler404(e):
 
 app.register_error_handler(404, errorHandler404)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='localhost', port=5000, debug=True)

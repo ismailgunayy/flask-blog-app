@@ -13,11 +13,11 @@
 <div class="jumbotron">
   <h1 class="display-3">
     {{article.title}}
-    <a href="/editArticle/{{article.id}}" class="btn btn-secondary"
+    <a href="/editArticle/{{article.articleID}}" class="btn btn-secondary"
       ><i class="far fa-edit"></i
     ></a>
     <a
-      href="/deleteArticle/{{article.id}}"
+      href="/deleteArticle/{{article.articleID}}"
       class="btn btn-danger"
       onclick="return confirm('Are you sure you want to delete this article?');"
       ><i class="fas fa-trash"></i

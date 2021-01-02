@@ -23,6 +23,14 @@ img {
   transform: scale(1.1);
 }
 
+.container {
+  margin-bottom: 75px;
+}
+
+footer > .container {
+  margin-bottom: 0px;
+}
+
 footer {
   position: fixed;
   bottom: 0;
@@ -35,7 +43,7 @@ footer {
   color: #a3a3a3;
   font-size: 28px;
   text-decoration: none;
-  transition: all .15s ease-in-out;
+  transition: all 0.15s ease-in-out;
 }
 
 .footer-icon:hover {
@@ -47,7 +55,7 @@ footer {
 }
 
 .fa-linkedin-in:hover {
-  color: #0A66C2;
+  color: #0a66c2;
 }
 
 .fa-twitter:hover {
@@ -55,13 +63,13 @@ footer {
 }
 
 .fa-instagram:hover {
-  color: #AA39A3;
+  color: #aa39a3;
 }
 
 .fa-facebook-f:hover {
-  color: #1196F5;
+  color: #1196f5;
 }
 
 .fa-youtube:hover {
-  color: #FF0000;
+  color: #ff0000;
 }

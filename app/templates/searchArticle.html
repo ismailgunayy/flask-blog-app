@@ -3,12 +3,12 @@
 {% block body %}
 
 <h3>Search Results</h3>
-
+<hr>
 <ul class="list-group">
   {% for article in articles %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
     <div clsass="mr-auto">
-      <a href="/article/{{article.id}}">{{article.title}}</a>
+      <a href="/article/{{article.articleID}}">{{article.title}}</a>
     </div>
     <div class="ml-auto">
       <span class="badge-pill"
@@ -20,7 +20,7 @@
   {% endfor %} {% for article in articles2 %}
   <li class="list-group-item d-flex justify-content-between align-items-center">
     <div class="mr-auto">
-      <a href="/article/{{article.id}}">{{article.title}}</a>
+      <a href="/article/{{article.articleID}}">{{article.title}}</a>
     </div>
     <div class="ml-auto">
       <span class="badge-pill"

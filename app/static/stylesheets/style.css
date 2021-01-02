@@ -2,6 +2,10 @@ body {
   font-size: 17px;
 }
 
+.jumbotron {
+  background-color: white;
+}
+
 img {
   object-fit: contain;
   max-width: 100%;

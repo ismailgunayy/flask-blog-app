@@ -1,13 +1,12 @@
 {% extends 'layout.html' %}
 
-{% if article%}
+{% if article %}
   {% set titleName = article.title %}
 {% else %}
   {% set titleName = "Warning" %}
 {% endif %}
 
-{% block title %}{{titleName}}
-{% endblock title %}
+{% block title %}{{titleName}}{% endblock title %}
 
 {% block body %} {% if article %}
 {% if session['username'] == article.author or session['username'] == 'admin' %}

@@ -14,14 +14,23 @@ footer {
   color: white;
 }
 
+.nav-item {
+  transition: all .15s ease-in-out;
+}
+
+.nav-item:hover {
+  transform: scale(1.23);
+}
+
 .footer-icon {
   color: #a3a3a3;
+  font-size: 28px;
   text-decoration: none;
   transition: all .15s ease-in-out;
 }
 
 .footer-icon:hover {
-  transform: scale(1.6);
+  transform: scale(1.45);
 }
 
 .fa-github:hover {

@@ -1,7 +1,6 @@
 from functools import wraps
 import sqlite3
 from flask import Flask, render_template, flash, redirect, url_for, session, request
-from flask_mysqldb import MySQL
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
@@ -29,20 +28,15 @@ dbCursor.execute(dbArticlesQuery)
 dbCursor.execute(dbUsersQuery)
 dbConnection.commit()
 
+
+# APP SETTINGS
 app = Flask(__name__)
 app.secret_key = 'flask-blog-app'
 app.config['SESSION_TYPE'] = 'filesystem'
 app.static_folder = 'static'
 
-# app.config['MYSQL_HOST'] = 'localhost'
-# app.config['MYSQL_USER'] = 'root'
-# app.config['MYSQL_PASSWORD'] = ''
-# app.config['MYSQL_DB'] = 'ismailgunay'
-# app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
-# mysql = MySQL(app)
 
-
-# LOGIN CHECK DECORATOR
+# LOGIN CHECK
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -62,7 +56,7 @@ def adminCheck():
     return False
 
 
-# REGISTER FORM CLASS
+# REGISTER FORM
 class RegisterForm(Form):
     name = StringField("Full Name", validators=[validators.input_required()])
     username = StringField('Username', validators=[
@@ -76,10 +70,17 @@ class RegisterForm(Form):
     confirm = PasswordField('Confirm Password')
 
 
-# LOGIN FORM CLASS
+# LOGIN FORM
 class LoginForm(Form):
     username = StringField('Username')
     password = PasswordField('Password')
+
+
+# ARTICLE FORM
+class ArticleForm(Form):
+    title = StringField('Article Title')
+    content = TextAreaField('Article Content', validators=[
+                            validators.Length(min=23)])
 
 
 # INDEX
@@ -185,7 +186,6 @@ def addArticle():
 
         return redirect(url_for('dashboard'))
 
-
     return render_template('addArticle.html', form=form)
 
 
@@ -213,7 +213,6 @@ def editArticle(id):
             form.title.data = article['title']
             form.content.data = article['content']
             return render_template('editArticle.html', form=form)
-
 
         flash(
             'There is no such article or you may have not the permission to edit', 'warning')
@@ -286,13 +285,6 @@ def searchArticle():
 
         flash('There is no article includes {}'.format(keyword), 'warning')
         return redirect(url_for('articles'))
-
-
-# ARTICLE FORM
-class ArticleForm(Form):
-    title = StringField('Article Title')
-    content = TextAreaField('Article Content', validators=[
-                            validators.Length(min=23)])
 
 
 # REGISTER
@@ -369,5 +361,12 @@ def logout():
     return redirect(url_for('index'))
 
 
+# ERROR
+@app.errorhandler(404)
+def errorHandler404(e):
+    return render_template('404.html'), 404
+
+
+app.register_error_handler(404, errorHandler404)
 if __name__ == '__main__':
     app.run(debug=True)

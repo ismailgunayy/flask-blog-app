@@ -7,6 +7,7 @@ pip install Flask
 pip install Flask-WTF
 pip install passlib
 pip install wtforms
+pip install email_validator
 ```
 In the `app` directory,
 ```

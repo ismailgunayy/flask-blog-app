@@ -348,9 +348,6 @@ def login():
 
         if len(result) > 0:
             data = result[0]
-            print(result)
-            print(data)
-            print(type(data))
             realPassword = data['password']
 
             if sha256_crypt.verify(passwordEntered, realPassword):

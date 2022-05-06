@@ -4,7 +4,7 @@ from flask import Flask, render_template, flash, redirect, url_for, session, req
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators
 from passlib.hash import sha256_crypt
 
-dbConnection = sqlite3.connect("app/blog.db", check_same_thread=False)
+dbConnection = sqlite3.connect("blog.db", check_same_thread=False)
 dbConnection.row_factory = sqlite3.Row
 dbCursor = dbConnection.cursor()
 
